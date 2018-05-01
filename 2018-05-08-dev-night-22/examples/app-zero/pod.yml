@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-zero
+spec:
+  containers:
+  - name: app-zero
+    image: nginx
+    ports:
+    - containerPort: 8080

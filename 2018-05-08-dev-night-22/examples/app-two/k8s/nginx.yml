@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: api
+    tier: frontend
+  ports:
+  - protocol: "TCP"
+    port: 80
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  selector:
+    matchLabels:
+      app: api
+      tier: frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: api
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: vlkdev/k8sapp-nginx

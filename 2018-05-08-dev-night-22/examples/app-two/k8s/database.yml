@@ -1,0 +1,41 @@
+kind: Service
+apiVersion: v1
+metadata:
+    name: database
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: database
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: database
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+      - name: database
+        image: vlkdev/k8sapp-db
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-storage
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pv-claim
