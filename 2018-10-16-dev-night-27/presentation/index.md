@@ -15,31 +15,40 @@ Sysadmin @ Tradebyte
 ## Agenda
 
 1. What is it?
-2. Who built it?
 3. How does it work?
-4. Usage at Tradebyte
+4. How does it work **at Tradebyte**?
+
+## Prometheus
+
+* by SoundCloud
+* similar to Google's borgmon
+* now independent open source project
+* part of CNCF
+
+::: notes
+Nearly 20.000 stars on github
+:::
 
 ## Prometheus
 
 * Simple data model
 * Very powerful, flexible
 
-## Prometheus
+## Architecture
 
-* by SoundCloud
-* similar to Google's borgmon
-* no independent open source project
-* CNCF
+![](assets/img/architecture.png "Architecture"){style="box-shadow:none;border:none;vertical-align=middle"}
+
+::: notes
+* pull based
+* http
+* ingest everything
+:::
 
 ## Metrics
 
 ```
 http_requets_total 514.0
 ```
-
-::: notes
-always a float
-:::
 
 ## Metrics
 
@@ -62,7 +71,7 @@ counters or gauges
 ## Node exporter
 
 ```
-...
+[...]
 node_load1 0.68
 node_load5 1.14
 node_load15 1.42
@@ -70,30 +79,28 @@ node_memory_MemFree_bytes 5.730304e+08
 node_memory_MemTotal_bytes 3.381096448e+10
 node_network_receive_bytes_total{device="eth0"} 8.0238013e+12
 node_network_receive_errs_total{device="eth0"} 0
-...
+[...]
 ```
 
 ## MySQL
 
 ```
-...
+[...]
 mysql_up 1
 mysql_slave_status_seconds_behind_master 0
 mysql_slave_status_slave_sql_running 1
 mysql_slave_status_slave_io_running 1
-...
+[...]
 ```
 
 ## Exporters
 
 * PostgreSQL
 * ElasticSearch
-* IPMI
 * RabbitMQ
 * Ceph
 * Apache
 * Nginx
-* Traefik
 * Docker
 * GitHub
 * Kubernetes
@@ -147,14 +154,16 @@ def long_running_function():
 from prometheus_client import Summary
 compute_time = Summary('compute_time')
 
-@compute.time.time()
+@compute_time.time()
 def long_running_function():
     do_compute()
 ```
 
+Result:
+
 ```
-compute_time_count
-compute_time_sum
+compute_time_count 142.0
+compute_time_sum 321.42
 ```
 
 ## What to do with metrics?
@@ -163,14 +172,30 @@ compute_time_sum
 
 also, Grafana
 
-## What to do with metrics?
+## Alerting
+
+![](assets/img/architecture.png "Architecture"){style="box-shadow:none;border:none;vertical-align=middle"}
+
+## Alerting
+
+![](assets/img/architecture_2.png "Architecture"){style="box-shadow:none;border:none;vertical-align=middle"}
+
+## Alerting
 
 ```yaml
 alert: InternalServerErrorResponses
 expr: http_requets_total{response="500"} > 10
 annotations:
-  summary: "Too many 500 errors"
+  summary: "Too many 500 HTTP responses"
 ```
+
+::: notes
+expressions:
+
+* sum/avg/count
+* linear\_predict
+* inter-host
+:::
 
 ## Alertmanager
 
@@ -179,13 +204,39 @@ annotations:
 
 * Mail, OpsGenie, PagerDuty, Slack
 
-## Architecture
+## Target discovery
 
-![](assets/img/architecture.png "Architecture"){style="box-shadow:none;border:none;vertical-align=middle"}
+* Kubernetes / Marathon / OpenStack
+* AWS / GCE / Azure
 
-## Architecture
+## Backing Storage
 
-![](assets/img/architecture_2.png "Architecture"){style="box-shadow:none;border:none;vertical-align=middle"}
+* InfluxDB
+* PostgreSQL/TimescaleDB
+
+## Prometheus at Tradebyte
+
+before: Nagios / Check\_MK
+
+currently migrating to Prometheus
+
+::: notes
+nagios:
+
+* host-centric
+* fixed thresholds
+:::
+
+## Prometheus at Tradebyte
+
+* Similar architecture to Check\_MK
+* Easy setup
+* Steep learning curve
+
+## Prometheus at Tradebyte
+
+* Built ~10 custom exporters
+* Very easy to do
 
 ## All-in-one Solution
 
@@ -194,22 +245,11 @@ annotations:
 
 → Easy correlation
 
-## Architecture
+::: notes
 
-Target discovery
+* lots of 500s -> maybe DB servers are overloaded
+* lots of 500s -> all servers are well
 
-* Kubernetes / Marathon / OpenStack
-* AWS / GCE / Azure
+:::
 
-## Architecture
-
-Backing Storage
-
-* InfluxDB
-* PostgreSQL/TimescaleDB
-
-## Experience
-
-* Easy setup
-* Steep learning curve
-* Similar model to Check_MK
+# Thank you!
